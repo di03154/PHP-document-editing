@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script>
+    function contain() {
+        var xhttp = new XMLHttpRequest();
+        var textObj = document.getElementById("text");  // text객체를 받아옴
+        var text = textObj.value;   // text안의 값 변수
+        var target  = event.target.id;  // php파일에서 기능구분을 위한 변수
+        var check = false;  // 파일 유무 체크 변수
+        switch(target){
+            case "button1":
+                // 변경할 값
+                var trans_target = prompt("변경할 값을 입력하세요!" ,"여기 입력하세요");;
+                // 변경될 값
+                var trans = prompt("변경될 값을 입력하세요!","여기 입력하세요" );
+                // URL 주소
+                var url = "B.php?text=" + text + "&button=" + target + "&hidden1=" + trans_target + "&hidden2=" + trans;   // URL주소 GET형식
+                break;
+            case "button2":
+                // URL 주소
+                var url = "B.php?text=" + text + "&button=" + target;
+                break;
+            case "button3":
+                // URL 주소
+                var url = "B.php?text=" + text + "&button=" + target;
+                break;
+            case "button4":
+                // 파일 이름을 받는 변수
+                var fName = prompt("파일 이름을 입력하세요!","여기 입력하세요" );
+                // 체크 확인
+                check = true;
+                // URL 주소
+                var url = "B.php?text=" + text + "&button=" + target + "&fname=" + fName;
+                break;
+        }
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                if (check != true) {
+                    // B.php파일에서 받아온 값을 resultText에 넣어준다
+                    textObj.value = xhttp.responseText;
+                } else {
+                    // 파일명을 보여줄 div 객체를 받음
+                    var show = document.getElementById("fname");
+                    // 다운로드를 받을 div 객체를 받음
+                    var down = document.getElementById("down");
+                    // 하이퍼 텍스트를 생성해줌
+                    var hyperObj = document.createElement("a");
+                    // 하이퍼 텍스트를 생성해줌
+                    var hyperObj1 = document.createElement("a");
+                    // br 테그 생성
+                    var brObj = document.createElement("br");
+                    var brObj1 = document.createElement("br");
+                    // 파일출력 A태그에 속성값 부여
+                    hyperObj.setAttribute("href", xhttp.responseText + ".txt");
+                    hyperObj.setAttribute("name", "ffName");
+                    hyperObj.setAttribute("id", xhttp.responseText);
+                    hyperObj.innerHTML += xhttp.responseText + ".txt";
+                    // 다운로드 A태그에 속성값 부여
+                    hyperObj1.setAttribute("download", "");
+                    hyperObj1.setAttribute("href", xhttp.responseText + ".txt");
+                    hyperObj1.innerHTML += xhttp.responseText + ".txt";
+                    // 클릭시 다음 이벤스 실행
+                    hyperObj.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        fileopen();
+                    })
+                    // 파일명을 출력
+                    show.appendChild(hyperObj);
+                    show.appendChild(brObj);
+                    down.appendChild(hyperObj1);
+                    down.appendChild(brObj1);
+                }
+            }
+        }
+        xhttp.open("GET", url, true);
+        xhttp.send();
+    }
+    // 파일 불러오는 함수
+    function fileopen() {
+        var xmlReqObj = new XMLHttpRequest();
+        var textObj = document.getElementById("text");               // text객체를 받아옴
+        var text = textObj.value;                                // text안의 값 변수
+        var target  = event.target.href;                            // php파일에서 기능구분을 위한 변수
+        var url = "B.php?text=" + text + "&button=" + target;   // URL 주소
+        xmlReqObj.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                this.value = this.responseText;
+            }
+        }
+        xmlReqObj.open("GET", url, true);
+        xmlReqObj.send();
+    }
+</script>
+<body>
+<textarea id = "text" name = "text" cols = 50% rows = 30%></textarea>
+<button id = "button1" name = "button" onclick="contain()">찾아바꾸기</button>
+<button id = "button2" name = "button" onclick="contain()">소문자 -> 대문자</button>
+<button id = "button3" name = "button" onclick="contain()">대문자 -> 소문자</button>
+<button id = "button4" name = "button" onclick="contain()">파일로 저장</button>
+<input type="text" id = "hidden1" name = "hidden1" hidden>
+<input type="text" id = "hidden2" name = "hidden2" hidden>
+<div id = "fname" name = "fname">파일출력<br></div>
+<div id = "down">파일 다운로드 <br></div>
+</body>
+</html>
